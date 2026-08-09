@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture — Baha Manila</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&family=Public+Sans:wght@300..800&family=Martian+Mono:wdth,wght@87.5..112.5,400..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0038A8; --red:#CE1126; --gold:#FCD116; --white:#fff;
+  --ink:#06122B; --ink-70:rgba(6,18,43,.70); --ink-55:rgba(6,18,43,.55);
+  --ink-16:rgba(6,18,43,.16); --ink-08:rgba(6,18,43,.08); --paper:#F2F5FB;
+  --display:"Archivo",system-ui,sans-serif;
+  --body:"Public Sans",system-ui,sans-serif;
+  --mono:"Martian Mono",ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);
+  font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+
+header.top{background:var(--ink);color:#fff;padding:34px 0 30px}
+header.top h1{margin:0 0 6px;font-family:var(--display);
+  font-variation-settings:"wdth" 112,"wght" 830;
+  font-size:clamp(28px,4.4vw,46px);line-height:1;letter-spacing:-.03em}
+header.top p{margin:0;color:rgba(255,255,255,.72);font-size:15px}
+.stamp{margin-top:14px;display:inline-flex;gap:9px;align-items:center;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 14px}
+
+main{padding:38px 0 70px}
+h2{margin:44px 0 6px;font-family:var(--display);
+  font-variation-settings:"wdth" 110,"wght" 800;
+  font-size:clamp(21px,2.6vw,30px);letter-spacing:-.02em;line-height:1.1}
+h2:first-of-type{margin-top:0}
+.sub{margin:0 0 18px;color:var(--ink-55);font-size:14.5px}
+p{margin:0 0 14px;max-width:74ch}
+code{font-family:var(--mono);font-size:.84em;background:var(--ink-08);
+  padding:2px 6px;border-radius:5px}
+a{color:var(--blue)}
+
+/* ── diagram ─────────────────────────────────────────── */
+.diagram{background:var(--paper);border:1px solid var(--ink-08);border-radius:20px;
+  padding:clamp(16px,3vw,30px);overflow-x:auto}
+.lane{display:flex;flex-direction:column;gap:12px;min-width:660px}
+.row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.node{flex:1;min-width:130px;background:#fff;border:1.5px solid var(--ink-16);
+  border-radius:12px;padding:11px 13px}
+.node b{display:block;font-family:var(--mono);font-size:10.5px;font-weight:700;
+  letter-spacing:.04em;line-height:1.35}
+.node span{display:block;margin-top:4px;font-size:12.5px;color:var(--ink-55);line-height:1.4}
+.node.blue{border-color:var(--blue);border-left-width:5px}
+.node.red{border-color:var(--red);border-left-width:5px}
+.node.gold{border-color:#E0B90A;border-left-width:5px}
+.node.muted{border-style:dashed;color:var(--ink-55);background:transparent}
+.node.store{background:var(--ink);color:#fff;border-color:var(--ink)}
+.node.store span{color:rgba(255,255,255,.66)}
+
+.zone{border:2px dashed var(--blue);border-radius:16px;padding:14px;
+  position:relative;margin:6px 0}
+.zone > .tag{position:absolute;top:-10px;left:14px;background:var(--paper);
+  padding:0 8px;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
+.zone.outside{border-color:var(--ink-16)}
+.zone.outside > .tag{color:var(--ink-55)}
+
+.arrow{display:flex;align-items:center;justify-content:center;gap:9px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-55);padding:1px 0}
+.arrow::before,.arrow::after{content:"";height:1px;flex:1;background:var(--ink-16)}
+
+/* ── tables ──────────────────────────────────────────── */
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:0 0 12px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--ink-16);vertical-align:top}
+th{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-55);white-space:nowrap}
+td:first-child{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.yes{color:var(--blue);font-weight:700}
+.no{color:var(--ink-55)}
+
+.callout{border-radius:14px;padding:16px 18px;margin:18px 0;font-size:15px}
+.callout p{margin:0 0 8px}.callout p:last-child{margin:0}
+.callout.warn{background:#FDF2F3;border:1px solid rgba(206,17,38,.25)}
+.callout.note{background:var(--paper);border:1px solid var(--ink-08)}
+.callout b{font-family:var(--display);font-variation-settings:"wdth" 106,"wght" 740}
+
+footer{background:var(--ink);color:rgba(255,255,255,.6);padding:22px 0 30px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+@media (max-width:640px){ body{font-size:15px} }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Architecture</h1>
+    <p>Baha Manila — what is deployed, not what was designed.</p>
+    <span class="stamp">Verified against the live AWS account · ap-southeast-1 · 2026-08-09</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="callout note">
+    <p><b>Reference only.</b> This page is a public snapshot of an internal
+    document from the private repository
+    <a href="https://github.com/thejustinjames/baha-alert"><code>thejustinjames/baha-alert</code></a>
+    (visible to collaborators only). The authoritative sources are the CDK in
+    <code>IaC/aws</code> and the settings rationale in <code>IaC/DEPLOYED.md</code>,
+    both in that repo. Everything here was read back from the live account
+    rather than from the code. The agency data-access request letters are
+    public in <a href="https://github.com/thejustinjames/baha-alert-docs/tree/main/data-access">
+    <code>data-access/</code></a>.</p>
+  </div>
+
+  <h2>The pipeline</h2>
+  <p class="sub">Rain becomes a reading, a reading becomes an event, an event becomes a warning.</p>
+
+  <div class="diagram">
+    <div class="lane">
+
+      <div class="zone outside">
+        <span class="tag">Public internet</span>
+        <div class="row">
+          <div class="node"><b>PAGASA</b><span>River gauges, dam bulletins, rainfall</span></div>
+          <div class="node muted"><b>OCD CALABARZON</b><span>Upper Wawa — adapter built, no live feed</span></div>
+        </div>
+      </div>
+
+      <div class="arrow">scheduled pull</div>
+
+      <div class="zone outside">
+        <span class="tag">Collectors · outside the VPC</span>
+        <div class="row">
+          <div class="node blue"><b>pmt_water</b><span>every 5 min</span></div>
+          <div class="node blue"><b>warning_posts</b><span>every 5 min</span></div>
+          <div class="node blue"><b>rainfall</b><span>every 10 min</span></div>
+          <div class="node blue"><b>dams</b><span>every 15 min</span></div>
+        </div>
+      </div>
+
+      <div class="arrow">archive first, then parse</div>
+
+      <div class="row">
+        <div class="node store"><b>S3 baha-raw-archive</b><span>Versioned · Object Lock COMPLIANCE · every response kept before parsing</span></div>
+        <div class="node gold"><b>SQS baha-raw-observations</b><span>batch 10 · partial failure reporting</span></div>
+        <div class="node muted"><b>DLQ + alarm</b><span>a reading that could not be parsed</span></div>
+      </div>
+
+      <div class="arrow">consume</div>
+
+      <div class="zone">
+        <span class="tag">VPC · public subnets · no NAT gateway</span>
+        <div class="row">
+          <div class="node blue"><b>baha-normalizer</b><span>Validate, persist, run the event engine</span></div>
+          <div class="node store"><b>RDS PostgreSQL 16.14 + PostGIS</b><span>db.t4g.micro · single AZ · SSL forced</span></div>
+          <div class="node blue"><b>baha-api</b><span>Fastify · HTTP API</span></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="node red"><b>baha-notify</b><span>Resolve who is downstream, apply policy, write the delivery ledger</span></div>
+        </div>
+      </div>
+
+      <div class="arrow">derived events</div>
+
+      <div class="row">
+        <div class="node gold"><b>SQS baha-notifications</b><span>1-day retention · a stale warning is worthless</span></div>
+        <div class="node muted"><b>DLQ + alarm</b><span>a warning that was never delivered</span></div>
+      </div>
+
+      <div class="arrow">synchronous invoke · via Lambda VPC endpoint</div>
+
+      <div class="zone outside">
+        <span class="tag">Outside the VPC · needs the internet</span>
+        <div class="row">
+          <div class="node red"><b>baha-push-sender</b><span>No database, no state. PUSH_ENABLED = false</span></div>
+          <div class="node"><b>Expo → APNs / FCM</b><span>timeSensitive interruption level</span></div>
+          <div class="node"><b>Baha Manila</b><span>iOS · Android · web preview</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="callout note">
+    <p><b>Why delivery is split in two.</b> <code>baha-notify</code> needs
+    Postgres, which is in the VPC. Expo needs the internet, which this VPC
+    deliberately cannot reach. Rather than buy a route between them for about
+    $32/month, the notifier resolves recipients and writes the ledger, then
+    synchronously invokes a sender that has no database access and does nothing
+    but send. The call is synchronous on purpose: fire-and-forget would be
+    cheaper and would ruin the audit trail, because "handed to another function"
+    is not an outcome anybody can act on after a flood.</p>
+  </div>
+
+  <h2>Stacks</h2>
+  <p class="sub">Six, all CDK. <code>cdk diff --all</code> reports no differences against deployed state.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>Stack</th><th>Region</th><th>Contains</th></tr>
+    <tr><td>BahaArchive-dev</td><td>ap-southeast-1</td><td>Raw archive bucket, tiles bucket</td></tr>
+    <tr><td>BahaDns-dev</td><td>ap-southeast-1</td><td>Route 53 zone <code>phflood.agrisphere.asia</code></td></tr>
+    <tr><td>BahaIngest-dev</td><td>ap-southeast-1</td><td>Collectors, schedules, both queues, DLQs, alarms, ops topic</td></tr>
+    <tr><td>BahaData-dev</td><td>ap-southeast-1</td><td>VPC, RDS, normalizer, notify, push sender, VPC endpoints</td></tr>
+    <tr><td>BahaApi-dev</td><td>ap-southeast-1</td><td>HTTP API and Fastify Lambda</td></tr>
+    <tr><td>BahaBilling-dev</td><td><b>us-east-1</b></td><td>Budget and cost alarms — billing metrics exist only there</td></tr>
+  </table>
+  </div>
+
+  <h2>Compute</h2>
+  <div class="scroll">
+  <table>
+    <tr><th>Function</th><th>Runtime</th><th>Mem</th><th>Timeout</th><th>In VPC</th></tr>
+    <tr><td>baha-collector-pmt_water</td><td>nodejs22 arm64</td><td>512</td><td>90 s</td><td class="no">no</td></tr>
+    <tr><td>baha-collector-warning_posts</td><td>nodejs22 arm64</td><td>512</td><td>90 s</td><td class="no">no</td></tr>
+    <tr><td>baha-collector-rainfall</td><td>nodejs22 arm64</td><td>512</td><td>90 s</td><td class="no">no</td></tr>
+    <tr><td>baha-collector-dams</td><td>nodejs22 arm64</td><td>512</td><td>90 s</td><td class="no">no</td></tr>
+    <tr><td>baha-normalizer</td><td>nodejs22 arm64</td><td>512</td><td>60 s</td><td class="yes">yes</td></tr>
+    <tr><td>baha-api</td><td>nodejs22 arm64</td><td>512</td><td>30 s</td><td class="yes">yes</td></tr>
+    <tr><td>baha-notify</td><td>nodejs22 arm64</td><td>512</td><td>90 s</td><td class="yes">yes</td></tr>
+    <tr><td>baha-push-sender</td><td>nodejs22 arm64</td><td>256</td><td>20 s</td><td class="no">no</td></tr>
+  </table>
+  </div>
+
+  <h2>Guardrails</h2>
+  <div class="scroll">
+  <table>
+    <tr><th>Alarm</th><th>Fires when</th></tr>
+    <tr><td>baha-collector-*-failing</td><td>A collector fails repeatedly — four of them, one per source</td></tr>
+    <tr><td>baha-raw-observations-dlq</td><td>A reading could not be parsed</td></tr>
+    <tr><td>baha-notifications-dlq</td><td><b>A warning was not delivered</b></td></tr>
+  </table>
+  </div>
+  <p>All route to SNS <code>baha-ops-alerts-dev</code>. Budget
+  <code>baha-alert-monthly</code> is $150, with a separate account-wide cost
+  topic in us-east-1.</p>
+
+  <div class="callout warn">
+    <p><b>Added 2026-08-09.</b> The notifications DLQ had no alarm. It was the
+    only queue without one, and it is the one carrying flood warnings — a
+    derived event could fail delivery three times and sit there with nobody
+    told. The observations queue, carrying readings, was alarmed from the
+    start.</p>
+  </div>
+
+  <h2>Not managed by CloudFormation</h2>
+  <p class="sub"><code>cdk diff</code> will never mention these.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>Resource</th><th>Created by</th><th>Note</th></tr>
+    <tr><td>Amplify baha-preview</td><td>IaC/scripts/deploy-amplify-preview.sh</td>
+        <td>Password-protected preview at <code>preview.phflood.agrisphere.asia</code>. Manual zip deploy rather than a Git connection, to avoid holding a GitHub token</td></tr>
+    <tr><td>baha/preview/basic-auth</td><td>the same script</td><td>Generated once, read back on later runs</td></tr>
+    <tr><td>baha/android/release-keystore</td><td>IaC/scripts/build-android.sh</td>
+        <td><b>That script is untracked in git.</b> Infrastructure that creates a credential should not live only on one laptop</td></tr>
+  </table>
+  </div>
+  <p><code>baha/dev/db</code> <em>is</em> CDK-managed, by <code>BahaData-dev</code>.</p>
+
+  <h2>Outside AWS</h2>
+  <div class="scroll">
+  <table>
+    <tr><th>Thing</th><th>Where</th></tr>
+    <tr><td>www.agrisphere.asia</td><td>Cloudflare Pages project <code>manila-flood-monitor</code></td></tr>
+    <tr><td>agrisphere.asia DNS</td><td>GoDaddy — not Cloudflare, not Route 53</td></tr>
+    <tr><td>phflood.agrisphere.asia</td><td>Route 53, delegated from GoDaddy by NS records</td></tr>
+    <tr><td>iOS builds, push keys</td><td>EAS (Expo)</td></tr>
+  </table>
+  </div>
+
+  <div class="callout warn">
+    <p><b>One DNS hazard.</b> The <code>NS</code> records delegating
+    <code>phflood</code> to Route 53 live at GoDaddy, not in Route 53 itself.
+    Lose them and the API domain goes with them — both
+    <code>api.phflood.agrisphere.asia</code> and the Amplify preview.</p>
+    <p>The <code>www</code> CNAME was corrected on 2026-08-09 and now names
+    <code>manila-flood-monitor.pages.dev</code> everywhere. The old
+    <code>manilia-flood-monitor</code> project is no longer load-bearing and
+    can be deleted. The apex has no records and does not resolve; GoDaddy
+    cannot CNAME an apex, so reaching the site without <code>www</code> needs
+    GoDaddy Forwarding.</p>
+  </div>
+
+  <h2>Known gaps</h2>
+  <ul>
+    <li><code>IaC/scripts/build-android.sh</code> is untracked, and it creates a secret.</li>
+    <li>Upper Wawa has no live feed — the adapter exists, a public endpoint does not.</li>
+    <li><code>PUSH_ENABLED=false</code>: delivery is deployed and deliberately inert until a full storm has been watched end to end.</li>
+    <li>Watershed geometry is a hand-drawn envelope, so the impact resolver still refuses to deliver on it.</li>
+    <li>Single AZ, 1-day backups — acceptable while S3 holds the immutable archive and the database is derived state.</li>
+  </ul>
+
+</main>
+
+<footer>
+  <div class="wrap">Baha Manila · public snapshot of an internal reference · generated from the live account 2026-08-09 · source: <a href="https://github.com/thejustinjames/baha-alert" style="color:inherit">thejustinjames/baha-alert</a> (private)</div>
+</footer>
+
+</body>
+</html>
