@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Architecture — Baha Manila</title>
+<title>Architecture — Baha Manila (public)</title>
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -253,13 +253,11 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:22px 0 30px;
   <table>
     <tr><th>Resource</th><th>Created by</th><th>Note</th></tr>
     <tr><td>Amplify baha-preview</td><td>IaC/scripts/deploy-amplify-preview.sh</td>
-        <td>Password-protected preview at <code>preview.phflood.agrisphere.asia</code>. Manual zip deploy rather than a Git connection, to avoid holding a GitHub token</td></tr>
-    <tr><td>baha/preview/basic-auth</td><td>the same script</td><td>Generated once, read back on later runs</td></tr>
-    <tr><td>baha/android/release-keystore</td><td>IaC/scripts/build-android.sh</td>
-        <td><b>That script is untracked in git.</b> Infrastructure that creates a credential should not live only on one laptop</td></tr>
+        <td>Password-protected preview environment. Manual zip deploy rather than a Git connection, to avoid holding a GitHub token</td></tr>
+    <tr><td>Android signing assets</td><td>IaC/scripts/build-android.sh</td>
+        <td>Release signing material is created by script rather than CDK</td></tr>
   </table>
   </div>
-  <p><code>baha/dev/db</code> <em>is</em> CDK-managed, by <code>BahaData-dev</code>.</p>
 
   <h2>Outside AWS</h2>
   <div class="scroll">
@@ -287,7 +285,6 @@ footer{background:var(--ink);color:rgba(255,255,255,.6);padding:22px 0 30px;
 
   <h2>Known gaps</h2>
   <ul>
-    <li><code>IaC/scripts/build-android.sh</code> is untracked, and it creates a secret.</li>
     <li>Upper Wawa has no live feed — the adapter exists, a public endpoint does not.</li>
     <li><code>PUSH_ENABLED=false</code>: delivery is deployed and deliberately inert until a full storm has been watched end to end.</li>
     <li>Watershed geometry is a hand-drawn envelope, so the impact resolver still refuses to deliver on it.</li>
